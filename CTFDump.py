@@ -7,6 +7,7 @@ import requests
 from os import path
 from requests.sessions import urljoin, urlparse
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from slugify import slugify
 
 __version__ = "0.1.0"
 
@@ -85,11 +86,11 @@ def run(url, username, password):
 
     # Get Challenges
     for challenge in iter_challenges(url):
-        category_path = path.join(hostname, re.sub('[^\w\-_ ]', '', challenge['category'].strip()))
+        category_path = path.join(hostname, slugify(challenge['category']))
         if not path.exists(category_path):
             os.mkdir(category_path)
 
-        challenge_path = path.join(category_path, re.sub('[^\w\-_ ]', '', challenge['name'].strip()))
+        challenge_path = path.join(category_path, slugify(challenge['name']))
         if not path.exists(challenge_path):
             os.mkdir(challenge_path)
 
