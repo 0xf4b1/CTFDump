@@ -101,7 +101,8 @@ def run(url, username, password):
                     f.write("> %s\n>\n" % line)
                 for file_name in challenge['files']:
                     fn = path.basename(urlparse(file_name).path)
-                    download_file(urljoin(url, "/files/%s" % file_name), path.join(challenge_path, fn))
+                    # FIXME url sometimes with prefix /files/
+                    download_file(urljoin(url, file_name), path.join(challenge_path, fn))
                     f.write("> [%s](%s)\n>\n" % (fn, fn))
 
                 file_names = re.findall("https?://\w+(?:\.\w+)+(?:/[\w._-]+)+", challenge['description'], re.DOTALL)
