@@ -93,20 +93,22 @@ def run(url, username, password):
         if not path.exists(challenge_path):
             os.mkdir(challenge_path)
 
-            with codecs.open(path.join(challenge_path, "ReadMe.md"), "wb", encoding='utf-8') as f:
-                f.write(u"Name: %s\n" % challenge['name'])
-                f.write(u"Value: %d\n" % challenge['value'])
-                f.write(u"Description: %s\n" % challenge['description'])
+            with codecs.open(path.join(challenge_path, "README.md"), "wb", encoding='utf-8') as f:
                 logger.info("Creating Challenge [%s] %s" % (challenge['category'] or "No Category", challenge['name']))
+                f.write("# %s\n\n" % challenge['name'])
+                f.write("## %s - Points: %d\n\n" % (challenge['category'], challenge['value']))
+                for line in challenge['description'].splitlines():
+                    f.write("> %s\n>\n" % line)
+                for file_name in challenge['files']:
+                    fn = path.basename(urlparse(file_name).path)
+                    download_file(urljoin(url, "/files/%s" % file_name), path.join(challenge_path, fn))
+                    f.write("> [%s](%s)\n>\n" % (fn, fn))
 
-            file_names = re.findall("https?://\w+(?:\.\w+)+(?:/[\w._-]+)+", challenge['description'], re.DOTALL)
-            for file_name in file_names:
-                fn = path.basename(file_name)
-                download_file(file_name, path.join(challenge_path, fn))
-
-            for file_name in challenge['files']:
-                fn = path.basename(file_name)
-                download_file(urljoin(url, "/files/%s" % file_name), path.join(challenge_path, fn))
+                file_names = re.findall("https?://\w+(?:\.\w+)+(?:/[\w._-]+)+", challenge['description'], re.DOTALL)
+                for file_name in file_names:
+                    fn = path.basename(file_name)
+                    download_file(file_name, path.join(challenge_path, fn))
+                    f.write("> [%s](%s)\n>\n" % (fn, fn))
 
     # Logout
     logout(url)
